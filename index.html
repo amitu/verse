@@ -1,21 +1,38 @@
 <!doctype html>
 <html>
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8"/>
     <title>Hello Verse</title>
+    <style>
+        html, body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: black;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+    </style>
 </head>
 <body>
-<h1 id="out">Loading…</h1>
+<canvas id="canvas"></canvas>
 
 <script type="module">
-    import init, { greet } from "./pkg/verse.js";
+    import init from "./pkg/verse.js";
 
-    async function run() {
-        await init();
-        document.getElementById("out").textContent = greet();
-    }
+    // Suppress winit's expected control flow exception
+    window.addEventListener("unhandledrejection", (event) => {
+        if (event.reason?.message?.includes("Using exceptions for control flow")) {
+            event.preventDefault();
+        }
+    });
 
-    run();
+    init();
 </script>
 </body>
 </html>

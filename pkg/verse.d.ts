@@ -1,15 +1,23 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export function greet(): string;
+export function run_web(): void;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
-    readonly greet: () => [number, number];
-    readonly __wbindgen_externrefs: WebAssembly.Table;
-    readonly __wbindgen_free: (a: number, b: number, c: number) => void;
+    readonly run_web: () => void;
+    readonly __wasm_bindgen_func_elem_1011: (a: number, b: number) => void;
+    readonly __wasm_bindgen_func_elem_2690: (a: number, b: number) => void;
+    readonly __wasm_bindgen_func_elem_1317: (a: number, b: number, c: number, d: number) => void;
+    readonly __wasm_bindgen_func_elem_1316: (a: number, b: number, c: number) => void;
+    readonly __wasm_bindgen_func_elem_2691: (a: number, b: number, c: number) => void;
+    readonly __wasm_bindgen_func_elem_1318: (a: number, b: number) => void;
+    readonly __wbindgen_export: (a: number, b: number) => number;
+    readonly __wbindgen_export2: (a: number, b: number, c: number, d: number) => number;
+    readonly __wbindgen_export3: (a: number) => void;
+    readonly __wbindgen_export4: (a: number, b: number, c: number) => void;
     readonly __wbindgen_start: () => void;
 }
 
