@@ -1,0 +1,15 @@
+{
+  "name": "verse",
+  "type": "module",
+  "version": "0.1.0",
+  "files": [
+    "verse_bg.wasm",
+    "verse.js",
+    "verse.d.ts"
+  ],
+  "main": "verse.js",
+  "types": "verse.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

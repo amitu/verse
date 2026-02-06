@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Hello Verse</title>
+</head>
+<body>
+<h1 id="out">Loading…</h1>
+
+<script type="module">
+    import init, { greet } from "./pkg/verse.js";
+
+    async function run() {
+        await init();
+        document.getElementById("out").textContent = greet();
+    }
+
+    run();
+</script>
+</body>
+</html>

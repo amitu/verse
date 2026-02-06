@@ -1,0 +1,3 @@
+[toolchain]
+channel = "1.93.0" # update rust-version in Cargo.toml when you update this
+components = ["rustfmt", "clippy", "rust-src"]
