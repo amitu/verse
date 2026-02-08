@@ -11,6 +11,13 @@ struct VertexOutput {
 @group(1) @binding(0)
 var<uniform> uniforms: vec2<f32>;
 
+struct CameraUniform {
+    view_proj: mat4x4<f32>,
+};
+
+@group(2) @binding(0)
+var<uniform> camera: CameraUniform;
+
 @vertex
 fn vs_main(
     model: VertexInput,
@@ -18,8 +25,9 @@ fn vs_main(
     var out: VertexOutput;
     out.tex_coords = model.tex_coords;
 //    out.clip_position = vec4<f32>(model.position.xy + vec2(0.5, 0.0), model.position.z, 1.0);
-    out.clip_position = vec4<f32>(model.position.xy + uniforms, model.position.z, 1.0);
-//    out.clip_position = vec4<f32>(model.position.xy, uniforms.x, 1.0);
+//    out.clip_position = vec4<f32>(model.position.xy + uniforms, model.position.z, 1.0);
+    out.clip_position = camera.view_proj * vec4<f32>(model.position.xy + uniforms, model.position.z, 1.0);
+//    out.clip_position = vec4<f32>(model. position.xy, uniforms.x, 1.0);
     return out;
 }
 
