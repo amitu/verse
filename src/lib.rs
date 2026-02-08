@@ -7,6 +7,13 @@ use winit::{
 };
 
 #[repr(C)]
+#[derive(Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
+struct Uniforms {
+    offset: [f32; 2],   // x, y offset in clip space (-1 to 1)
+    _padding: [f32; 2], // GPU needs 16-byte alignment
+}
+
+#[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Pod, bytemuck::Zeroable)]
 struct Vertex {
     position: [f32; 3],
@@ -73,6 +80,8 @@ pub struct State {
     index_buffer: wgpu::Buffer,
     num_indices: u32,
     diffuse_bind_group: wgpu::BindGroup,
+    uniform_buffer: wgpu::Buffer,
+    uniform_bind_group: wgpu::BindGroup,
     x: f64,
     y: f64,
 }
@@ -240,12 +249,47 @@ impl State {
             label: Some("diffuse_bind_group"),
         });
 
+        let uniforms = Uniforms {
+            offset: [0.0, 0.0],
+            _padding: [0.0, 0.0],
+        };
+
+        let uniform_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("Uniform Buffer"),
+            contents: bytemuck::cast_slice(&[uniforms]),
+            usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+        });
+
+        let uniform_bind_group_layout =
+            device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+                entries: &[wgpu::BindGroupLayoutEntry {
+                    binding: 0,
+                    visibility: wgpu::ShaderStages::VERTEX, // Vertex shader will use it
+                    ty: wgpu::BindingType::Buffer {
+                        ty: wgpu::BufferBindingType::Uniform,
+                        has_dynamic_offset: false,
+                        min_binding_size: None,
+                    },
+                    count: None,
+                }],
+                label: Some("uniform_bind_group_layout"),
+            });
+
+        let uniform_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+            layout: &uniform_bind_group_layout,
+            entries: &[wgpu::BindGroupEntry {
+                binding: 0,
+                resource: uniform_buffer.as_entire_binding(),
+            }],
+            label: Some("uniform_bind_group"),
+        });
+
         let shader = device.create_shader_module(wgpu::include_wgsl!("shader.wgsl"));
 
         let render_pipeline_layout =
             device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
                 label: Some("Render Pipeline Layout"),
-                bind_group_layouts: &[&texture_bind_group_layout],
+                bind_group_layouts: &[&texture_bind_group_layout, &uniform_bind_group_layout],
                 immediate_size: 0,
             });
 
@@ -316,6 +360,8 @@ impl State {
             index_buffer,
             num_indices: INDICES.len() as u32,
             diffuse_bind_group,
+            uniform_buffer,
+            uniform_bind_group,
             x: 0.1,
             y: 0.1,
         })
@@ -382,6 +428,7 @@ impl State {
 
             render_pass.set_pipeline(&self.render_pipeline); // 2.
             render_pass.set_bind_group(0, &self.diffuse_bind_group, &[]); // NEW!
+            render_pass.set_bind_group(1, &self.uniform_bind_group, &[]);
             render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
             render_pass.set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16); // 1.
             render_pass.draw_indexed(0..self.num_indices, 0, 0..1); // 2.
@@ -397,6 +444,18 @@ impl State {
     fn handle_mouse_moved(&mut self, x: f64, y: f64) {
         self.x = x / self.config.width as f64;
         self.y = y / self.config.height as f64;
+
+        // Convert to clip space: -1 to 1, with (0,0) at center
+        let offset_x = (x / self.config.width as f64) * 2.0 - 1.0;
+        let offset_y = -((y / self.config.height as f64) * 2.0 - 1.0); // Flip Y
+
+        let uniforms = Uniforms {
+            offset: [offset_x as f32, offset_y as f32],
+            _padding: [0.0, 0.0],
+        };
+
+        self.queue
+            .write_buffer(&self.uniform_buffer, 0, bytemuck::cast_slice(&[uniforms]));
     }
 
     fn update(&mut self) {}
