@@ -9,13 +9,16 @@ fn format_url(file_name: &str) -> reqwest::Url {
     let window = web_sys::window().unwrap();
     let location = window.location();
     let mut origin = location.origin().unwrap();
-    if origin.to_lowercase().contains("amitu.github.io") {
+    log::info!("origin: {origin:?}");
+    if origin.to_lowercase().contains("github") {
         origin = format!("{}/verse/res", origin);
     } else {
         origin = format!("{}/res", origin);
     }
     let base = reqwest::Url::parse(&format!("{}/", origin,)).unwrap();
-    base.join(file_name).unwrap()
+    let url = base.join(file_name).unwrap();
+    log::info!("url: {url:?}");
+    url
 }
 
 pub async fn load_string(file_name: &str) -> anyhow::Result<String> {

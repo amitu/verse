@@ -512,9 +512,7 @@ impl State {
 
     fn update(&mut self) {
         self.camera_controller.update_camera(&mut self.camera);
-        log::info!("{:?}", self.camera);
         self.camera_uniform.update_view_proj(&self.camera);
-        log::info!("{:?}", self.camera_uniform);
         self.queue.write_buffer(
             &self.camera_buffer,
             0,
