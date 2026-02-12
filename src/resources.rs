@@ -9,7 +9,7 @@ fn format_url(file_name: &str) -> reqwest::Url {
     let window = web_sys::window().unwrap();
     let location = window.location();
     let mut origin = location.origin().unwrap();
-    if origin.to_lowercase() == "amitu.github.io" {
+    if origin.to_lowercase().contains("amitu.github.io") {
         origin = format!("{}/verse/res", origin);
     } else {
         origin = format!("{}/res", origin);
