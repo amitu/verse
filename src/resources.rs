@@ -83,6 +83,7 @@ pub async fn load_model(
         },
         |p| async move {
             let mat_text = load_string(&p).await.unwrap();
+            log::info!("p: {p:?}");
             tobj::load_mtl_buf(&mut BufReader::new(Cursor::new(mat_text)))
         },
     )
@@ -90,6 +91,7 @@ pub async fn load_model(
 
     let mut materials = Vec::new();
     for m in obj_materials? {
+        log::info!("texture: {:?}", m.diffuse_texture);
         let diffuse_texture = load_texture(&m.diffuse_texture, device, queue).await?;
         let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
             layout,
