@@ -55,8 +55,6 @@ Users walk through locations. Scenes play around them.
 Approach a scene → camera control transfers to the director.  
 Press escape → regain free movement.
 
------
-
 ## Core Concepts
 
 ### 1. Verse
@@ -237,8 +235,6 @@ Portal
 Portals display static previews.
 Activation moves player to target location.
 
------
-
 ## Repository Model
 
 Everything is modular and Git-backed:
@@ -264,8 +260,6 @@ Verse composes them at runtime.
 - Philosophical dialogues in spatial form
 - Educational walk-through universes
 
------
-
 ## Design Principles
 
 - Deterministic by default
@@ -275,8 +269,6 @@ Verse composes them at runtime.
 - Loopable narrative time
 - Spatial knowledge over linear chapters
 
------
-
 ## Roadmap
 
 - Formal file format spec
@@ -285,8 +277,6 @@ Verse composes them at runtime.
 - Branching scene support
 - LLM-driven actors (optional layer)
 - Collaborative world curation tools
-
-----
 
 ## License
 
