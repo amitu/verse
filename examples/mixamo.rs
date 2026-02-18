@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use std::time::Duration;
 
 fn main() {
     App::new()
@@ -9,14 +10,27 @@ fn main() {
             ..default()
         })
         .add_systems(Startup, setup)
-        .add_systems(Update, setup_scene_once_loaded)
+        .add_systems(
+            Update,
+            (setup_scene_once_loaded, handle_animation_transitions),
+        )
         .run();
 }
 
 #[derive(Resource)]
 struct Animations {
     graph: Handle<AnimationGraph>,
-    index: AnimationNodeIndex,
+    // Store indices for each animation
+    action_index: AnimationNodeIndex,
+    idle_index: AnimationNodeIndex,
+}
+
+// Track which animation is currently playing
+#[derive(Component, Default, PartialEq)]
+enum AnimationState {
+    #[default]
+    Action,
+    Idle,
 }
 
 fn setup(
@@ -24,19 +38,24 @@ fn setup(
     asset_server: Res<AssetServer>,
     mut graphs: ResMut<Assets<AnimationGraph>>,
 ) {
-    // Load the character model - change this path to your downloaded model
+    // Load the character model
     let character = asset_server.load(GltfAssetLabel::Scene(0).from_asset("character.glb"));
 
-    // Load the animation from the same file (Mixamo embeds animations in the model)
-    let animation = asset_server.load(GltfAssetLabel::Animation(0).from_asset("standing-idle.glb"));
+    // Load animations from different GLB files
+    let action_clip = asset_server.load(GltfAssetLabel::Animation(0).from_asset("character.glb"));
+    let idle_clip = asset_server.load(GltfAssetLabel::Animation(0).from_asset("standing-idle.glb"));
 
-    // Create animation graph
-    let (graph, index) = AnimationGraph::from_clip(animation);
+    // Create animation graph with multiple clips
+    let mut graph = AnimationGraph::new();
+    let action_index = graph.add_clip(action_clip, 1.0, graph.root);
+    let idle_index = graph.add_clip(idle_clip, 1.0, graph.root);
+
     let graph_handle = graphs.add(graph);
 
     commands.insert_resource(Animations {
         graph: graph_handle,
-        index,
+        action_index,
+        idle_index,
     });
 
     // Spawn the character
@@ -68,19 +87,51 @@ fn setup(
     ));
 }
 
-// Once the scene is loaded, start the animation
+// Once the scene is loaded, start with the action animation
 fn setup_scene_once_loaded(
     mut commands: Commands,
     animations: Res<Animations>,
     mut players: Query<(Entity, &mut AnimationPlayer), Added<AnimationPlayer>>,
 ) {
     for (entity, mut player) in &mut players {
-        // Add the animation graph to the entity
-        commands
-            .entity(entity)
-            .insert(AnimationGraphHandle(animations.graph.clone()));
+        // Add the animation graph, transitions, and state tracking
+        commands.entity(entity).insert((
+            AnimationGraphHandle(animations.graph.clone()),
+            AnimationTransitions::new(),
+            AnimationState::Action,
+        ));
 
-        // Play the animation on loop
-        player.play(animations.index).repeat();
+        // Start with the action animation (plays once, no repeat)
+        player.play(animations.action_index);
+    }
+}
+
+// Check if action animation finished and transition to idle
+fn handle_animation_transitions(
+    animations: Res<Animations>,
+    mut query: Query<(&mut AnimationPlayer, &mut AnimationTransitions, &mut AnimationState)>,
+) {
+    for (mut player, mut transitions, mut state) in &mut query {
+        // Only check for transition if we're still in Action state
+        if *state != AnimationState::Action {
+            continue;
+        }
+
+        // Check if the action animation has finished
+        if let Some(active) = player.animation(animations.action_index) {
+            if active.is_finished() {
+                // Transition to idle with a 0.3 second blend
+                transitions
+                    .play(
+                        &mut player,
+                        animations.idle_index,
+                        Duration::from_secs_f32(0.3),
+                    )
+                    .repeat();
+
+                // Update state so we don't trigger again
+                *state = AnimationState::Idle;
+            }
+        }
     }
 }
