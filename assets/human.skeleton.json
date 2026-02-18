@@ -1,116 +1,599 @@
 {
-  "_comment": "Human skeleton definition - shared structure for all humanoid characters",
-
+  "_comment": "Complete humanoid skeleton - bone structure, joint types, constraints",
   "bones": {
     "hip": {
       "type": "root",
       "default_length": 0,
-      "children": ["upper_leg_left", "upper_leg_right", "spine"]
+      "children": [
+        "hip_left",
+        "hip_right",
+        "spine"
+      ]
     },
-
+    "hip_left": {
+      "type": "bone",
+      "default_length": 10,
+      "joint": {
+        "type": "ball_socket",
+        "axes": [
+          "flexion",
+          "abduction",
+          "rotation"
+        ],
+        "default_angles": {
+          "abduction": -90
+        },
+        "constraints": {
+          "flexion": [
+            0,
+            0
+          ],
+          "abduction": [
+            -90,
+            -90
+          ],
+          "rotation": [
+            0,
+            0
+          ]
+        }
+      },
+      "children": [
+        "upper_leg_left"
+      ]
+    },
+    "hip_right": {
+      "type": "bone",
+      "default_length": 10,
+      "joint": {
+        "type": "ball_socket",
+        "axes": [
+          "flexion",
+          "abduction",
+          "rotation"
+        ],
+        "default_angles": {
+          "abduction": 90
+        },
+        "constraints": {
+          "flexion": [
+            0,
+            0
+          ],
+          "abduction": [
+            90,
+            90
+          ],
+          "rotation": [
+            0,
+            0
+          ]
+        }
+      },
+      "children": [
+        "upper_leg_right"
+      ]
+    },
     "upper_leg_left": {
       "type": "bone",
       "default_length": 45,
       "joint": {
         "type": "ball_socket",
-        "axes": ["flexion", "abduction", "rotation"],
+        "axes": [
+          "flexion",
+          "abduction",
+          "rotation"
+        ],
+        "default_angles": {
+          "abduction": 90
+        },
         "constraints": {
-          "flexion": [-30, 120],
-          "abduction": [-45, 45],
-          "rotation": [-45, 45]
+          "flexion": [
+            -30,
+            120
+          ],
+          "abduction": [
+            45,
+            135
+          ],
+          "rotation": [
+            -45,
+            45
+          ]
         }
       },
-      "children": ["lower_leg_left"]
+      "children": [
+        "lower_leg_left"
+      ]
     },
-
     "lower_leg_left": {
       "type": "bone",
       "default_length": 45,
       "joint": {
         "type": "hinge",
-        "axes": ["angle"],
+        "axes": [
+          "angle"
+        ],
         "constraints": {
-          "angle": [0, 140]
+          "angle": [
+            0,
+            140
+          ]
         }
       },
-      "children": ["foot_left"]
+      "children": [
+        "foot_left"
+      ]
     },
-
     "foot_left": {
       "type": "bone",
       "default_length": 20,
       "joint": {
         "type": "ball_socket",
-        "axes": ["flexion", "abduction", "rotation"],
+        "axes": [
+          "flexion",
+          "abduction",
+          "rotation"
+        ],
         "default_angles": {
           "flexion": 90
         },
         "constraints": {
-          "flexion": [40, 140],
-          "abduction": [-30, 30],
-          "rotation": [-30, 30]
+          "flexion": [
+            40,
+            140
+          ],
+          "abduction": [
+            -30,
+            30
+          ],
+          "rotation": [
+            -30,
+            30
+          ]
         }
       },
       "children": []
     },
-
     "upper_leg_right": {
       "type": "bone",
       "default_length": 45,
       "joint": {
         "type": "ball_socket",
-        "axes": ["flexion", "abduction", "rotation"],
+        "axes": [
+          "flexion",
+          "abduction",
+          "rotation"
+        ],
+        "default_angles": {
+          "abduction": -90
+        },
         "constraints": {
-          "flexion": [-30, 120],
-          "abduction": [-45, 45],
-          "rotation": [-45, 45]
+          "flexion": [
+            -30,
+            120
+          ],
+          "abduction": [
+            -135,
+            -45
+          ],
+          "rotation": [
+            -45,
+            45
+          ]
         }
       },
-      "children": ["lower_leg_right"]
+      "children": [
+        "lower_leg_right"
+      ]
     },
-
     "lower_leg_right": {
       "type": "bone",
       "default_length": 45,
       "joint": {
         "type": "hinge",
-        "axes": ["angle"],
+        "axes": [
+          "angle"
+        ],
         "constraints": {
-          "angle": [0, 140]
+          "angle": [
+            0,
+            140
+          ]
         }
       },
-      "children": ["foot_right"]
+      "children": [
+        "foot_right"
+      ]
     },
-
     "foot_right": {
       "type": "bone",
       "default_length": 20,
       "joint": {
         "type": "ball_socket",
-        "axes": ["flexion", "abduction", "rotation"],
+        "axes": [
+          "flexion",
+          "abduction",
+          "rotation"
+        ],
         "default_angles": {
           "flexion": 90
         },
         "constraints": {
-          "flexion": [40, 140],
-          "abduction": [-30, 30],
-          "rotation": [-30, 30]
+          "flexion": [
+            40,
+            140
+          ],
+          "abduction": [
+            -30,
+            30
+          ],
+          "rotation": [
+            -30,
+            30
+          ]
         }
       },
       "children": []
     },
-
     "spine": {
-      "_comment": "placeholder for upper body",
       "type": "bone",
-      "default_length": 50,
+      "default_length": 20,
       "joint": {
         "type": "ball_socket",
-        "axes": ["flexion", "abduction", "rotation"],
+        "axes": [
+          "flexion",
+          "abduction",
+          "rotation"
+        ],
+        "default_angles": {
+          "flexion": -180
+        },
         "constraints": {
-          "flexion": [-30, 30],
-          "abduction": [-20, 20],
-          "rotation": [-30, 30]
+          "flexion": [
+            -200,
+            -160
+          ],
+          "abduction": [
+            -15,
+            15
+          ],
+          "rotation": [
+            -20,
+            20
+          ]
+        }
+      },
+      "children": [
+        "spine1"
+      ]
+    },
+    "spine1": {
+      "type": "bone",
+      "default_length": 18,
+      "joint": {
+        "type": "ball_socket",
+        "axes": [
+          "flexion",
+          "abduction",
+          "rotation"
+        ],
+        "constraints": {
+          "flexion": [
+            -15,
+            15
+          ],
+          "abduction": [
+            -10,
+            10
+          ],
+          "rotation": [
+            -15,
+            15
+          ]
+        }
+      },
+      "children": [
+        "spine2"
+      ]
+    },
+    "spine2": {
+      "type": "bone",
+      "default_length": 18,
+      "joint": {
+        "type": "ball_socket",
+        "axes": [
+          "flexion",
+          "abduction",
+          "rotation"
+        ],
+        "constraints": {
+          "flexion": [
+            -15,
+            15
+          ],
+          "abduction": [
+            -10,
+            10
+          ],
+          "rotation": [
+            -15,
+            15
+          ]
+        }
+      },
+      "children": [
+        "neck",
+        "shoulder_left",
+        "shoulder_right"
+      ]
+    },
+    "neck": {
+      "type": "bone",
+      "default_length": 10,
+      "joint": {
+        "type": "ball_socket",
+        "axes": [
+          "flexion",
+          "abduction",
+          "rotation"
+        ],
+        "constraints": {
+          "flexion": [
+            -40,
+            40
+          ],
+          "abduction": [
+            -40,
+            40
+          ],
+          "rotation": [
+            -60,
+            60
+          ]
+        }
+      },
+      "children": [
+        "head"
+      ]
+    },
+    "head": {
+      "type": "bone",
+      "default_length": 20,
+      "joint": {
+        "type": "ball_socket",
+        "axes": [
+          "flexion",
+          "abduction",
+          "rotation"
+        ],
+        "constraints": {
+          "flexion": [
+            -30,
+            30
+          ],
+          "abduction": [
+            -30,
+            30
+          ],
+          "rotation": [
+            -45,
+            45
+          ]
+        }
+      },
+      "children": []
+    },
+    "shoulder_left": {
+      "type": "bone",
+      "default_length": 15,
+      "joint": {
+        "type": "ball_socket",
+        "axes": [
+          "flexion",
+          "abduction",
+          "rotation"
+        ],
+        "default_angles": {
+          "abduction": -90
+        },
+        "constraints": {
+          "flexion": [
+            -20,
+            20
+          ],
+          "abduction": [
+            -100,
+            -80
+          ],
+          "rotation": [
+            -20,
+            20
+          ]
+        }
+      },
+      "children": [
+        "upper_arm_left"
+      ]
+    },
+    "upper_arm_left": {
+      "type": "bone",
+      "default_length": 30,
+      "joint": {
+        "type": "ball_socket",
+        "axes": [
+          "flexion",
+          "abduction",
+          "rotation"
+        ],
+        "constraints": {
+          "flexion": [
+            -60,
+            180
+          ],
+          "abduction": [
+            -45,
+            180
+          ],
+          "rotation": [
+            -90,
+            90
+          ]
+        }
+      },
+      "children": [
+        "lower_arm_left"
+      ]
+    },
+    "lower_arm_left": {
+      "type": "bone",
+      "default_length": 28,
+      "joint": {
+        "type": "hinge",
+        "axes": [
+          "angle"
+        ],
+        "constraints": {
+          "angle": [
+            0,
+            145
+          ]
+        }
+      },
+      "children": [
+        "hand_left"
+      ]
+    },
+    "hand_left": {
+      "type": "bone",
+      "default_length": 18,
+      "joint": {
+        "type": "ball_socket",
+        "axes": [
+          "flexion",
+          "abduction",
+          "rotation"
+        ],
+        "constraints": {
+          "flexion": [
+            -80,
+            80
+          ],
+          "abduction": [
+            -40,
+            40
+          ],
+          "rotation": [
+            -30,
+            30
+          ]
+        }
+      },
+      "children": []
+    },
+    "shoulder_right": {
+      "type": "bone",
+      "default_length": 15,
+      "joint": {
+        "type": "ball_socket",
+        "axes": [
+          "flexion",
+          "abduction",
+          "rotation"
+        ],
+        "default_angles": {
+          "abduction": 90
+        },
+        "constraints": {
+          "flexion": [
+            -20,
+            20
+          ],
+          "abduction": [
+            80,
+            100
+          ],
+          "rotation": [
+            -20,
+            20
+          ]
+        }
+      },
+      "children": [
+        "upper_arm_right"
+      ]
+    },
+    "upper_arm_right": {
+      "type": "bone",
+      "default_length": 30,
+      "joint": {
+        "type": "ball_socket",
+        "axes": [
+          "flexion",
+          "abduction",
+          "rotation"
+        ],
+        "constraints": {
+          "flexion": [
+            -60,
+            180
+          ],
+          "abduction": [
+            -180,
+            45
+          ],
+          "rotation": [
+            -90,
+            90
+          ]
+        }
+      },
+      "children": [
+        "lower_arm_right"
+      ]
+    },
+    "lower_arm_right": {
+      "type": "bone",
+      "default_length": 28,
+      "joint": {
+        "type": "hinge",
+        "axes": [
+          "angle"
+        ],
+        "constraints": {
+          "angle": [
+            0,
+            145
+          ]
+        }
+      },
+      "children": [
+        "hand_right"
+      ]
+    },
+    "hand_right": {
+      "type": "bone",
+      "default_length": 18,
+      "joint": {
+        "type": "ball_socket",
+        "axes": [
+          "flexion",
+          "abduction",
+          "rotation"
+        ],
+        "constraints": {
+          "flexion": [
+            -80,
+            80
+          ],
+          "abduction": [
+            -40,
+            40
+          ],
+          "rotation": [
+            -30,
+            30
+          ]
         }
       },
       "children": []

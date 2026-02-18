@@ -293,22 +293,33 @@ fn setup(
     println!("Skeleton bones: {:?}", skeleton.bones.keys().collect::<Vec<_>>());
     println!("Character hip: {:?}", character.hip_position);
 
-    // Materials
+    // Materials for different body parts
     let joint_material = materials.add(StandardMaterial {
-        base_color: Color::srgb(1.0, 0.3, 0.3),
+        base_color: Color::srgb(1.0, 0.3, 0.3), // Red joints
         ..default()
     });
-    let bone_material = materials.add(StandardMaterial {
-        base_color: Color::srgb(0.8, 0.6, 0.4),
+    let torso_material = materials.add(StandardMaterial {
+        base_color: Color::srgb(0.4, 0.6, 0.8), // Blue torso
         ..default()
     });
-    let foot_material = materials.add(StandardMaterial {
-        base_color: Color::srgb(0.6, 0.4, 0.2),
+    let leg_material = materials.add(StandardMaterial {
+        base_color: Color::srgb(0.8, 0.6, 0.4), // Tan legs
+        ..default()
+    });
+    let arm_material = materials.add(StandardMaterial {
+        base_color: Color::srgb(0.7, 0.5, 0.3), // Brown arms
+        ..default()
+    });
+    let extremity_material = materials.add(StandardMaterial {
+        base_color: Color::srgb(0.9, 0.7, 0.5), // Lighter for hands/feet
+        ..default()
+    });
+    let head_material = materials.add(StandardMaterial {
+        base_color: Color::srgb(0.9, 0.75, 0.6), // Skin tone for head
         ..default()
     });
 
-    let joint_mesh = meshes.add(Sphere::new(3.0));
-    let bone_radius = 2.5;
+    let joint_mesh = meshes.add(Sphere::new(2.5));
 
     // Compute all bone positions starting from hip
     let visuals = compute_bone_visuals(
@@ -337,33 +348,68 @@ fn setup(
         let center = (visual.start + visual.end) / 2.0;
         let dir = (visual.end - visual.start).normalize();
 
-        // Choose mesh based on bone type
+        // Choose mesh and material based on bone name
+        let is_head = name == "head";
         let is_foot = name.contains("foot");
-        if is_foot {
+        let is_hand = name.contains("hand");
+        let is_leg = name.contains("leg");
+        let is_arm = name.contains("arm") || name.contains("shoulder");
+        let is_spine = name.contains("spine") || name == "neck";
+
+        if is_head {
+            // Ellipsoid for head (sphere scaled)
+            let head_mesh = meshes.add(Sphere::new(length * 0.6));
+            commands.spawn((
+                Mesh3d(head_mesh),
+                MeshMaterial3d(head_material.clone()),
+                Transform::from_translation(center),
+            ));
+        } else if is_foot {
             // Cuboid for feet
             let foot_mesh = meshes.add(Cuboid::new(8.0, 4.0, length));
             let foot_rotation = visual.rotation * Quat::from_rotation_x(std::f32::consts::FRAC_PI_2);
             commands.spawn((
                 Mesh3d(foot_mesh),
-                MeshMaterial3d(foot_material.clone()),
+                MeshMaterial3d(extremity_material.clone()),
                 Transform::from_translation(center).with_rotation(foot_rotation),
+            ));
+        } else if is_hand {
+            // Cuboid for hands
+            let hand_mesh = meshes.add(Cuboid::new(6.0, 3.0, length));
+            let hand_rotation = visual.rotation * Quat::from_rotation_x(std::f32::consts::FRAC_PI_2);
+            commands.spawn((
+                Mesh3d(hand_mesh),
+                MeshMaterial3d(extremity_material.clone()),
+                Transform::from_translation(center).with_rotation(hand_rotation),
             ));
         } else {
             // Cylinder for other bones
-            let bone_mesh = meshes.add(Cylinder::new(bone_radius, length));
+            let radius = if is_spine { 4.0 } else if is_leg { 3.0 } else { 2.5 };
+            let bone_mesh = meshes.add(Cylinder::new(radius, length));
+            let material = if is_spine {
+                torso_material.clone()
+            } else if is_leg {
+                leg_material.clone()
+            } else if is_arm {
+                arm_material.clone()
+            } else {
+                leg_material.clone()
+            };
             commands.spawn((
                 Mesh3d(bone_mesh),
-                MeshMaterial3d(bone_material.clone()),
+                MeshMaterial3d(material),
                 Transform::from_translation(center).with_rotation(rotation_from_direction(dir)),
             ));
         }
 
-        // Joint at end of bone
-        commands.spawn((
-            Mesh3d(joint_mesh.clone()),
-            MeshMaterial3d(joint_material.clone()),
-            Transform::from_translation(visual.end),
-        ));
+        // Joint at end of bone (skip for head)
+        if !is_head {
+            commands.spawn((
+                Mesh3d(joint_mesh.clone()),
+                MeshMaterial3d(joint_material.clone()),
+                Transform::from_translation(visual.end),
+            ));
+        }
 
         println!("  {}: {:?} -> {:?}", name, visual.start, visual.end);
     }
@@ -377,10 +423,10 @@ fn setup(
         })),
     ));
 
-    // Camera
+    // Camera - positioned to see full humanoid
     commands.spawn((
         Camera3d::default(),
-        Transform::from_xyz(150.0, 80.0, 150.0).looking_at(Vec3::new(0.0, 50.0, 0.0), Vec3::Y),
+        Transform::from_xyz(0.0, 120.0, 250.0).looking_at(Vec3::new(0.0, 100.0, 0.0), Vec3::Y),
         CameraController,
     ));
 

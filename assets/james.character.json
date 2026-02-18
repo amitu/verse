@@ -1,18 +1,35 @@
 {
-  "_comment": "James character - bone proportions and positioning",
+  "_comment": "James character - bone proportions (average adult male ~175cm)",
 
   "skeleton": "human.skeleton.json",
 
   "hip_position": [0, 100, 0],
 
   "bone_scales": {
-    "_comment": "Scale factors applied to default_length from skeleton",
+    "hip_left": 1.0,
+    "hip_right": 1.0,
     "upper_leg_left": 1.0,
     "lower_leg_left": 1.0,
     "foot_left": 1.0,
     "upper_leg_right": 1.0,
     "lower_leg_right": 1.0,
     "foot_right": 1.0,
-    "spine": 1.0
+
+    "spine": 1.0,
+    "spine1": 1.0,
+    "spine2": 1.0,
+
+    "neck": 1.0,
+    "head": 1.0,
+
+    "shoulder_left": 1.0,
+    "upper_arm_left": 1.0,
+    "lower_arm_left": 1.0,
+    "hand_left": 1.0,
+
+    "shoulder_right": 1.0,
+    "upper_arm_right": 1.0,
+    "lower_arm_right": 1.0,
+    "hand_right": 1.0
   }
 }

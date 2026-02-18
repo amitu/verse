@@ -1,41 +1,34 @@
 {
-  "_comment": "Standing pose - all angles in degrees",
+  "_comment": "Standing pose - neutral T-pose with arms out",
 
   "character": "james.character.json",
 
   "joints": {
-    "upper_leg_left": {
-      "flexion": 0,
-      "abduction": 0,
-      "rotation": 0
-    },
-    "lower_leg_left": {
-      "angle": 0
-    },
-    "foot_left": {
-      "flexion": 90,
-      "abduction": 0,
-      "rotation": 0
-    },
+    "hip_left": { "flexion": 0, "abduction": -90, "rotation": 0 },
+    "upper_leg_left": { "flexion": 0, "abduction": 90, "rotation": 0 },
+    "lower_leg_left": { "angle": 0 },
+    "foot_left": { "flexion": 90, "abduction": 0, "rotation": 0 },
 
-    "upper_leg_right": {
-      "flexion": 0,
-      "abduction": 0,
-      "rotation": 0
-    },
-    "lower_leg_right": {
-      "angle": 0
-    },
-    "foot_right": {
-      "flexion": 90,
-      "abduction": 0,
-      "rotation": 0
-    },
+    "hip_right": { "flexion": 0, "abduction": 90, "rotation": 0 },
+    "upper_leg_right": { "flexion": 0, "abduction": -90, "rotation": 0 },
+    "lower_leg_right": { "angle": 0 },
+    "foot_right": { "flexion": 90, "abduction": 0, "rotation": 0 },
 
-    "spine": {
-      "flexion": 0,
-      "abduction": 0,
-      "rotation": 0
-    }
+    "spine": { "flexion": -180, "abduction": 0, "rotation": 0 },
+    "spine1": { "flexion": 0, "abduction": 0, "rotation": 0 },
+    "spine2": { "flexion": 0, "abduction": 0, "rotation": 0 },
+
+    "neck": { "flexion": 0, "abduction": 0, "rotation": 0 },
+    "head": { "flexion": 0, "abduction": 0, "rotation": 0 },
+
+    "shoulder_left": { "flexion": 0, "abduction": -90, "rotation": 0 },
+    "upper_arm_left": { "flexion": 0, "abduction": 0, "rotation": 0 },
+    "lower_arm_left": { "angle": 0 },
+    "hand_left": { "flexion": 0, "abduction": 0, "rotation": 0 },
+
+    "shoulder_right": { "flexion": 0, "abduction": 90, "rotation": 0 },
+    "upper_arm_right": { "flexion": 0, "abduction": 0, "rotation": 0 },
+    "lower_arm_right": { "angle": 0 },
+    "hand_right": { "flexion": 0, "abduction": 0, "rotation": 0 }
   }
 }
