@@ -49,8 +49,8 @@ fn setup(
     asset_server: Res<AssetServer>,
     mut graphs: ResMut<Assets<AnimationGraph>>,
 ) {
-    // Load the character model
-    let character = asset_server.load(GltfAssetLabel::Scene(0).from_asset("character.glb"));
+    // Load the character model (james-fixed.glb has bone names matching animation files)
+    let character = asset_server.load(GltfAssetLabel::Scene(0).from_asset("james-fixed.glb"));
 
     // Load animations from different GLB files
     let action_clip: Handle<AnimationClip> =

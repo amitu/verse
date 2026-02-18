@@ -1,0 +1,70 @@
+{
+  "_comment": "Leg pose definition with human-readable angles in degrees",
+  "hip_position": [
+    0,
+    100,
+    0
+  ],
+  "upper_leg": {
+    "length": 45,
+    "joint": {
+      "type": "ball_socket",
+      "_comment": "flexion: forward/back, abduction: outward/inward, rotation: twist",
+      "flexion": 5,
+      "abduction": 5,
+      "rotation": 0,
+      "constraints": {
+        "flexion": [
+          -30,
+          120
+        ],
+        "abduction": [
+          -45,
+          45
+        ],
+        "rotation": [
+          -45,
+          45
+        ]
+      }
+    }
+  },
+  "lower_leg": {
+    "length": 45,
+    "joint": {
+      "type": "hinge",
+      "_comment": "knee bend: 0 = straight, positive = bent backward",
+      "angle": -5,
+      "constraints": {
+        "angle": [
+          0,
+          140
+        ]
+      }
+    }
+  },
+  "foot": {
+    "length": 20,
+    "joint": {
+      "type": "ball_socket",
+      "_comment": "flexion: toe up/down, abduction: toe in/out, rotation: sole twist. Default 90 flexion = foot horizontal",
+      "flexion": 90,
+      "abduction": 0,
+      "rotation": 0,
+      "constraints": {
+        "flexion": [
+          40,
+          140
+        ],
+        "abduction": [
+          -30,
+          30
+        ],
+        "rotation": [
+          -30,
+          30
+        ]
+      }
+    }
+  }
+}

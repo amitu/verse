@@ -4741,6 +4741,8 @@ dependencies = [
  "bevy",
  "fs_extra",
  "glob",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
