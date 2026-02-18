@@ -1,0 +1,119 @@
+{
+  "_comment": "Human skeleton definition - shared structure for all humanoid characters",
+
+  "bones": {
+    "hip": {
+      "type": "root",
+      "default_length": 0,
+      "children": ["upper_leg_left", "upper_leg_right", "spine"]
+    },
+
+    "upper_leg_left": {
+      "type": "bone",
+      "default_length": 45,
+      "joint": {
+        "type": "ball_socket",
+        "axes": ["flexion", "abduction", "rotation"],
+        "constraints": {
+          "flexion": [-30, 120],
+          "abduction": [-45, 45],
+          "rotation": [-45, 45]
+        }
+      },
+      "children": ["lower_leg_left"]
+    },
+
+    "lower_leg_left": {
+      "type": "bone",
+      "default_length": 45,
+      "joint": {
+        "type": "hinge",
+        "axes": ["angle"],
+        "constraints": {
+          "angle": [0, 140]
+        }
+      },
+      "children": ["foot_left"]
+    },
+
+    "foot_left": {
+      "type": "bone",
+      "default_length": 20,
+      "joint": {
+        "type": "ball_socket",
+        "axes": ["flexion", "abduction", "rotation"],
+        "default_angles": {
+          "flexion": 90
+        },
+        "constraints": {
+          "flexion": [40, 140],
+          "abduction": [-30, 30],
+          "rotation": [-30, 30]
+        }
+      },
+      "children": []
+    },
+
+    "upper_leg_right": {
+      "type": "bone",
+      "default_length": 45,
+      "joint": {
+        "type": "ball_socket",
+        "axes": ["flexion", "abduction", "rotation"],
+        "constraints": {
+          "flexion": [-30, 120],
+          "abduction": [-45, 45],
+          "rotation": [-45, 45]
+        }
+      },
+      "children": ["lower_leg_right"]
+    },
+
+    "lower_leg_right": {
+      "type": "bone",
+      "default_length": 45,
+      "joint": {
+        "type": "hinge",
+        "axes": ["angle"],
+        "constraints": {
+          "angle": [0, 140]
+        }
+      },
+      "children": ["foot_right"]
+    },
+
+    "foot_right": {
+      "type": "bone",
+      "default_length": 20,
+      "joint": {
+        "type": "ball_socket",
+        "axes": ["flexion", "abduction", "rotation"],
+        "default_angles": {
+          "flexion": 90
+        },
+        "constraints": {
+          "flexion": [40, 140],
+          "abduction": [-30, 30],
+          "rotation": [-30, 30]
+        }
+      },
+      "children": []
+    },
+
+    "spine": {
+      "_comment": "placeholder for upper body",
+      "type": "bone",
+      "default_length": 50,
+      "joint": {
+        "type": "ball_socket",
+        "axes": ["flexion", "abduction", "rotation"],
+        "constraints": {
+          "flexion": [-30, 30],
+          "abduction": [-20, 20],
+          "rotation": [-30, 30]
+        }
+      },
+      "children": []
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "_comment": "Standing pose - all angles in degrees",
+
+  "character": "james.character.json",
+
+  "joints": {
+    "upper_leg_left": {
+      "flexion": 0,
+      "abduction": 0,
+      "rotation": 0
+    },
+    "lower_leg_left": {
+      "angle": 0
+    },
+    "foot_left": {
+      "flexion": 90,
+      "abduction": 0,
+      "rotation": 0
+    },
+
+    "upper_leg_right": {
+      "flexion": 0,
+      "abduction": 0,
+      "rotation": 0
+    },
+    "lower_leg_right": {
+      "angle": 0
+    },
+    "foot_right": {
+      "flexion": 90,
+      "abduction": 0,
+      "rotation": 0
+    },
+
+    "spine": {
+      "flexion": 0,
+      "abduction": 0,
+      "rotation": 0
+    }
+  }
+}
