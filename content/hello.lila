@@ -1,0 +1,68 @@
+{
+    "elements": {
+        "circle-1": {
+            "kind": "circle",
+            "radius": 50.0,
+            "position": [0, 0, 0],
+            "rotation": [0, 0, 0, 1],
+        },
+        "enemy": {
+            "kind": "sprite",
+            "path": "enemy.png"
+        }
+    },
+    "text-styles": {
+        "default": {
+            "font-family": "assets/times-new-roman.ttf",
+            "font-size": 24,
+            "color": "red"
+        }
+    },
+    "text": {
+        "intro-text": "the life of circle",
+        "style": "default", // can be omitted
+    },
+    "timeline": [
+        // we run the timeline from top to bottom
+        // first we show the circle-1
+        {
+            "after": "start",
+            "who": "circle-1",
+            "action": "appear"
+        },
+        {
+            "after": "start",
+            "camera": "point-at",
+            "object": "circle-1"
+        }
+        // text slides from left to below the circle in 3 seconds
+        // on-end we create an event, "text-is-there"
+        {
+            "after": "start + 2s", //
+            "action": "slide-from-left",
+            "who": "intro-text",
+            "position": [0, -50, 0],
+            "on-end": "text-is-there",
+            "duration": 3.0,
+        },
+        {
+            "after": "text-is-there",
+            "action": "fall-below-the-screen",
+            "who": "circle-1",
+            "duration": 4.0,
+            "on-end": "intro-over",
+        },
+        {
+            "after": "text-is-there",
+            "action": "fall-below-the-screen",
+            "who": "text-1",
+            "duration": 5.0,
+            // "on-end": "", // not defining on end as nothing depends on that
+        },
+        {
+            "after": "intro-over + 1s", // nothing on the screen for a second
+            "who": "enemy",
+            "action": "fade-in",
+        }
+    ]
+}

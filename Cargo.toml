@@ -6,37 +6,19 @@ edition = "2024"
 [profile.release]
 strip = true
 
-[lib]
-crate-type = ["cdylib", "rlib"]
+# Enable a small amount of optimization in the dev profile.
+[profile.dev]
+opt-level = 1
+
+# Enable a large amount of optimization in the dev profile for dependencies.
+[profile.dev.package."*"]
+opt-level = 3
+
+#[lib]
+#crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-anyhow = "1.0"
-winit = { version = "0.30", features = ["android-native-activity"] }
-env_logger = "0.11"
-log = "0.4"
-wgpu = "28.0"
-pollster = "0.4"
-bytemuck = { version = "1.25.0", features = ["derive"] }
-cgmath = "0.18"
-tobj = { version = "3.2", default-features = false, features = ["async"] }
-
-[dependencies.image]
-version = "0.25"
-default-features = false
-features = ["png", "jpeg"]
-
-[target.'cfg(target_arch = "wasm32")'.dependencies]
-reqwest = { version = "0.11" }
-console_error_panic_hook = "0.1.7"
-console_log = "1.0"
-wasm-bindgen = "0.2.108"
-wasm-bindgen-futures = "0.4"
-web-sys = { version = "0.3", features = [
-    "Document",
-    "Window",
-    "Element",
-    "Location",
-] }
+bevy = "0.18"
 
 
 [package.metadata.wasm-pack.profile.release]

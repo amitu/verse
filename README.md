@@ -220,6 +220,8 @@ else:
 
 Escape key restores explorer camera.
 
+----
+
 ### 8. Portals
 
 Spatial connectors between locations.
