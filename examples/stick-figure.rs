@@ -1,14 +1,14 @@
-//! Render a skeleton using geometric primitives with proper separation:
-//! - skeleton.json: bone structure, joint types, constraints
-//! - character.json: bone scales, hip position
-//! - pose.json: joint angles
+//! Render a skeleton using geometric primitives with auto-reload.
 //!
-//! Usage: cargo run --example leg -- [pose_file]
+//! Usage: cargo run --example stick-figure -- [pose_file]
 //! Default pose: standing.pose.json
+//!
+//! Edit the pose JSON file and save - the preview updates automatically!
 
 use bevy::prelude::*;
 use std::collections::HashMap;
 use std::f32::consts::PI;
+use std::time::SystemTime;
 
 fn main() {
     App::new()
@@ -18,13 +18,30 @@ fn main() {
             brightness: 200.0,
             ..default()
         })
+        .init_resource::<FigureState>()
         .add_systems(Startup, setup)
-        .add_systems(Update, camera_controls)
+        .add_systems(Update, (camera_controls, check_reload))
         .run();
 }
 
+// ============ Resources ============
+
+#[derive(Resource, Default)]
+struct FigureState {
+    pose_file: String,
+    pose_path: String,
+    character_path: String,
+    skeleton_path: String,
+    last_modified: Option<SystemTime>,
+}
+
+// ============ Components ============
+
 #[derive(Component)]
 struct CameraController;
+
+#[derive(Component)]
+struct FigurePart;
 
 // ============ Data Structures ============
 
@@ -37,6 +54,7 @@ struct Skeleton {
 struct BoneDef {
     default_length: f32,
     joint_type: JointType,
+    #[allow(dead_code)]
     constraints: HashMap<String, (f32, f32)>,
     default_angles: HashMap<String, f32>,
     children: Vec<String>,
@@ -45,8 +63,8 @@ struct BoneDef {
 #[derive(Debug, Clone)]
 enum JointType {
     Root,
-    BallSocket, // 3 DOF: flexion, abduction, rotation
-    Hinge,      // 1 DOF: angle
+    BallSocket,
+    Hinge,
 }
 
 #[derive(Debug, Clone)]
@@ -73,6 +91,10 @@ fn resolve_path(path: &str) -> String {
         .into_iter()
         .find(|p| std::path::Path::new(p).exists())
         .unwrap_or_else(|| panic!("File not found: {}", path))
+}
+
+fn get_modified_time(path: &str) -> Option<SystemTime> {
+    std::fs::metadata(path).ok()?.modified().ok()
 }
 
 fn load_skeleton(path: &str) -> Skeleton {
@@ -134,14 +156,15 @@ fn load_skeleton(path: &str) -> Skeleton {
     Skeleton { bones }
 }
 
-fn load_character(path: &str) -> (Character, Skeleton) {
+fn load_character(path: &str) -> (Character, Skeleton, String) {
     let full_path = resolve_path(path);
     let content = std::fs::read_to_string(&full_path)
         .unwrap_or_else(|_| panic!("Failed to read character: {}", full_path));
     let json: serde_json::Value = serde_json::from_str(&content).expect("Invalid JSON");
 
-    let skeleton_path = json["skeleton"].as_str().unwrap_or("human.skeleton.json");
-    let skeleton = load_skeleton(skeleton_path);
+    let skeleton_file = json["skeleton"].as_str().unwrap_or("human.skeleton.json");
+    let skeleton_path = resolve_path(skeleton_file);
+    let skeleton = load_skeleton(skeleton_file);
 
     let hip_pos = json["hip_position"].as_array().unwrap();
     let hip_position = Vec3::new(
@@ -159,17 +182,18 @@ fn load_character(path: &str) -> (Character, Skeleton) {
         }
     }
 
-    (Character { hip_position, bone_scales }, skeleton)
+    (Character { hip_position, bone_scales }, skeleton, skeleton_path)
 }
 
-fn load_pose(path: &str) -> (Pose, Character, Skeleton) {
+fn load_pose(path: &str) -> (Pose, Character, Skeleton, String, String, String) {
     let full_path = resolve_path(path);
     let content = std::fs::read_to_string(&full_path)
         .unwrap_or_else(|_| panic!("Failed to read pose: {}", full_path));
     let json: serde_json::Value = serde_json::from_str(&content).expect("Invalid JSON");
 
-    let character_path = json["character"].as_str().unwrap_or("james.character.json");
-    let (character, skeleton) = load_character(character_path);
+    let character_file = json["character"].as_str().unwrap_or("james.character.json");
+    let character_path = resolve_path(character_file);
+    let (character, skeleton, skeleton_path) = load_character(character_file);
 
     let mut joints = HashMap::new();
     if let Some(joints_obj) = json["joints"].as_object() {
@@ -184,7 +208,7 @@ fn load_pose(path: &str) -> (Pose, Character, Skeleton) {
         }
     }
 
-    (Pose { joints }, character, skeleton)
+    (Pose { joints }, character, skeleton, full_path, character_path, skeleton_path)
 }
 
 // ============ Angle to Rotation ============
@@ -278,77 +302,60 @@ fn compute_bone_visuals(
     result
 }
 
-fn setup(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
+fn spawn_figure(
+    commands: &mut Commands,
+    meshes: &mut ResMut<Assets<Mesh>>,
+    materials: &mut ResMut<Assets<StandardMaterial>>,
+    skeleton: &Skeleton,
+    character: &Character,
+    pose: &Pose,
 ) {
-    // Get pose file from args or use default
-    let args: Vec<String> = std::env::args().collect();
-    let pose_file = args.get(1).map(|s| s.as_str()).unwrap_or("standing.pose.json");
-
-    println!("Loading pose: {}", pose_file);
-    let (pose, character, skeleton) = load_pose(pose_file);
-
-    println!("Skeleton bones: {:?}", skeleton.bones.keys().collect::<Vec<_>>());
-    println!("Character hip: {:?}", character.hip_position);
-
-    // Materials for different body parts
     let joint_material = materials.add(StandardMaterial {
-        base_color: Color::srgb(1.0, 0.3, 0.3), // Red joints
+        base_color: Color::srgb(1.0, 0.3, 0.3),
         ..default()
     });
     let torso_material = materials.add(StandardMaterial {
-        base_color: Color::srgb(0.4, 0.6, 0.8), // Blue torso
+        base_color: Color::srgb(0.4, 0.6, 0.8),
         ..default()
     });
     let leg_material = materials.add(StandardMaterial {
-        base_color: Color::srgb(0.8, 0.6, 0.4), // Tan legs
+        base_color: Color::srgb(0.8, 0.6, 0.4),
         ..default()
     });
     let arm_material = materials.add(StandardMaterial {
-        base_color: Color::srgb(0.7, 0.5, 0.3), // Brown arms
+        base_color: Color::srgb(0.7, 0.5, 0.3),
         ..default()
     });
     let extremity_material = materials.add(StandardMaterial {
-        base_color: Color::srgb(0.9, 0.7, 0.5), // Lighter for hands/feet
+        base_color: Color::srgb(0.9, 0.7, 0.5),
         ..default()
     });
     let head_material = materials.add(StandardMaterial {
-        base_color: Color::srgb(0.9, 0.75, 0.6), // Skin tone for head
+        base_color: Color::srgb(0.9, 0.75, 0.6),
         ..default()
     });
 
     let joint_mesh = meshes.add(Sphere::new(2.5));
 
-    // Compute all bone positions starting from hip
     let visuals = compute_bone_visuals(
-        &skeleton,
-        &character,
-        &pose,
-        "hip",
-        character.hip_position,
-        Quat::IDENTITY,
+        skeleton, character, pose, "hip", character.hip_position, Quat::IDENTITY,
     );
 
-    // Spawn hip joint
+    // Hip joint
     commands.spawn((
         Mesh3d(joint_mesh.clone()),
         MeshMaterial3d(joint_material.clone()),
         Transform::from_translation(character.hip_position),
+        FigurePart,
     ));
 
-    // Spawn bones and joints
     for (name, visual) in &visuals {
         let length = visual.start.distance(visual.end);
-        if length < 0.1 {
-            continue;
-        }
+        if length < 0.1 { continue; }
 
         let center = (visual.start + visual.end) / 2.0;
         let dir = (visual.end - visual.start).normalize();
 
-        // Choose mesh and material based on bone name
         let is_head = name == "head";
         let is_foot = name.contains("foot");
         let is_hand = name.contains("hand");
@@ -357,33 +364,32 @@ fn setup(
         let is_spine = name.contains("spine") || name == "neck";
 
         if is_head {
-            // Ellipsoid for head (sphere scaled)
             let head_mesh = meshes.add(Sphere::new(length * 0.6));
             commands.spawn((
                 Mesh3d(head_mesh),
                 MeshMaterial3d(head_material.clone()),
                 Transform::from_translation(center),
+                FigurePart,
             ));
         } else if is_foot {
-            // Cuboid for feet
             let foot_mesh = meshes.add(Cuboid::new(8.0, 4.0, length));
             let foot_rotation = visual.rotation * Quat::from_rotation_x(std::f32::consts::FRAC_PI_2);
             commands.spawn((
                 Mesh3d(foot_mesh),
                 MeshMaterial3d(extremity_material.clone()),
                 Transform::from_translation(center).with_rotation(foot_rotation),
+                FigurePart,
             ));
         } else if is_hand {
-            // Cuboid for hands
             let hand_mesh = meshes.add(Cuboid::new(6.0, 3.0, length));
             let hand_rotation = visual.rotation * Quat::from_rotation_x(std::f32::consts::FRAC_PI_2);
             commands.spawn((
                 Mesh3d(hand_mesh),
                 MeshMaterial3d(extremity_material.clone()),
                 Transform::from_translation(center).with_rotation(hand_rotation),
+                FigurePart,
             ));
         } else {
-            // Cylinder for other bones
             let radius = if is_spine { 4.0 } else if is_leg { 3.0 } else { 2.5 };
             let bone_mesh = meshes.add(Cylinder::new(radius, length));
             let material = if is_spine {
@@ -399,20 +405,40 @@ fn setup(
                 Mesh3d(bone_mesh),
                 MeshMaterial3d(material),
                 Transform::from_translation(center).with_rotation(rotation_from_direction(dir)),
+                FigurePart,
             ));
         }
 
-        // Joint at end of bone (skip for head)
         if !is_head {
             commands.spawn((
                 Mesh3d(joint_mesh.clone()),
                 MeshMaterial3d(joint_material.clone()),
                 Transform::from_translation(visual.end),
+                FigurePart,
             ));
         }
-
-        println!("  {}: {:?} -> {:?}", name, visual.start, visual.end);
     }
+}
+
+fn setup(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut state: ResMut<FigureState>,
+) {
+    let args: Vec<String> = std::env::args().collect();
+    let pose_file = args.get(1).map(|s| s.as_str()).unwrap_or("standing.pose.json");
+
+    println!("Loading pose: {}", pose_file);
+    let (pose, character, skeleton, pose_path, character_path, skeleton_path) = load_pose(pose_file);
+
+    state.pose_file = pose_file.to_string();
+    state.pose_path = pose_path.clone();
+    state.character_path = character_path;
+    state.skeleton_path = skeleton_path;
+    state.last_modified = get_modified_time(&pose_path);
+
+    spawn_figure(&mut commands, &mut meshes, &mut materials, &skeleton, &character, &pose);
 
     // Ground plane
     commands.spawn((
@@ -423,7 +449,7 @@ fn setup(
         })),
     ));
 
-    // Camera - positioned to see full humanoid
+    // Camera
     commands.spawn((
         Camera3d::default(),
         Transform::from_xyz(0.0, 120.0, 250.0).looking_at(Vec3::new(0.0, 100.0, 0.0), Vec3::Y),
@@ -441,6 +467,54 @@ fn setup(
     ));
 
     println!("\nControls: WASD=move, QE=up/down, Arrows=look");
+    println!("Auto-reload: Edit {} and save to update preview", pose_file);
+}
+
+fn check_reload(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut state: ResMut<FigureState>,
+    parts: Query<Entity, With<FigurePart>>,
+) {
+    // Check all three files for changes
+    let pose_modified = get_modified_time(&state.pose_path);
+    let char_modified = get_modified_time(&state.character_path);
+    let skel_modified = get_modified_time(&state.skeleton_path);
+
+    let latest = [pose_modified, char_modified, skel_modified]
+        .into_iter()
+        .flatten()
+        .max();
+
+    let needs_reload = match (&state.last_modified, &latest) {
+        (Some(old), Some(new)) => new > old,
+        (None, Some(_)) => true,
+        _ => false,
+    };
+
+    if !needs_reload {
+        return;
+    }
+
+    println!("Reloading...");
+    state.last_modified = latest;
+
+    // Despawn old figure
+    for entity in parts.iter() {
+        commands.entity(entity).despawn();
+    }
+
+    // Reload and respawn
+    match std::panic::catch_unwind(|| load_pose(&state.pose_file)) {
+        Ok((pose, character, skeleton, _, _, _)) => {
+            spawn_figure(&mut commands, &mut meshes, &mut materials, &skeleton, &character, &pose);
+            println!("Reloaded successfully!");
+        }
+        Err(_) => {
+            println!("Error reloading - fix the JSON and save again");
+        }
+    }
 }
 
 fn camera_controls(

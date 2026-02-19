@@ -3,30 +3,30 @@
   "character": "james.character.json",
   "joints": {
     "hip_left": { "flexion": 0, "abduction": -90, "rotation": 0 },
-    "upper_leg_left": { "flexion": 90, "abduction": 95, "rotation": 0 },
+    "upper_leg_left": { "flexion": -90, "abduction": 95, "rotation": 0 },
     "lower_leg_left": { "angle": 90 },
-    "foot_left": { "flexion": 0, "abduction": 0, "rotation": 0 },
+    "foot_left": { "flexion": -90, "abduction": 0, "rotation": 0 },
 
     "hip_right": { "flexion": 0, "abduction": 90, "rotation": 0 },
-    "upper_leg_right": { "flexion": 90, "abduction": -95, "rotation": 0 },
+    "upper_leg_right": { "flexion": -90, "abduction": -95, "rotation": 0 },
     "lower_leg_right": { "angle": 90 },
-    "foot_right": { "flexion": 0, "abduction": 0, "rotation": 0 },
+    "foot_right": { "flexion": -90, "abduction": 0, "rotation": 0 },
 
     "spine": { "flexion": -180, "abduction": 0, "rotation": 0 },
     "spine1": { "flexion": 0, "abduction": 0, "rotation": 0 },
     "spine2": { "flexion": 0, "abduction": 0, "rotation": 0 },
 
-    "neck": { "flexion": 0, "abduction": 0, "rotation": 0 },
+    "neck": { "flexion": 20, "abduction": 0, "rotation": 0 },
     "head": { "flexion": 0, "abduction": 0, "rotation": 0 },
 
-    "shoulder_left": { "flexion": 0, "abduction": -90, "rotation": 0 },
-    "upper_arm_left": { "flexion": 60, "abduction": 60, "rotation": 0 },
-    "lower_arm_left": { "angle": 90 },
-    "hand_left": { "flexion": 0, "abduction": 0, "rotation": 0 },
+    "shoulder_left": { "flexion": 0, "abduction": -100, "rotation": 120 },
+    "upper_arm_left": { "flexion": 30, "abduction": 60, "rotation": 50 },
+    "lower_arm_left": { "angle": -60 },
+    "hand_left": { "flexion": -40, "abduction": 0, "rotation": 0 },
 
-    "shoulder_right": { "flexion": 0, "abduction": 90, "rotation": 0 },
-    "upper_arm_right": { "flexion": 60, "abduction": -60, "rotation": 0 },
-    "lower_arm_right": { "angle": 90 },
-    "hand_right": { "flexion": 0, "abduction": 0, "rotation": 0 }
+    "shoulder_right": { "flexion": 0, "abduction": 100, "rotation": -20 },
+    "upper_arm_right": { "flexion": 60, "abduction": 60, "rotation": 0 },
+    "lower_arm_right": { "angle": 60 },
+    "hand_right": { "flexion": 40, "abduction": 40, "rotation": 0 }
   }
 }
