@@ -1,7 +1,9 @@
 {
-  "_comment": "Sitting pose - bend at hip 90, bend at knee 90",
+  "_comment": "Sitting pose",
   "character": "james.character.json",
   "joints": {
+    "pelvis": { "flexion": 0, "abduction": 0, "rotation": 0 },
+
     "hip_left": { "flexion": 90, "abduction": 5, "rotation": 0 },
     "knee_left": { "angle": 90 },
     "ankle_left": { "flexion": 0, "abduction": 0, "rotation": 0 },
@@ -17,10 +19,12 @@
     "neck": { "flexion": 0, "abduction": 0, "rotation": 0 },
     "head": { "flexion": 0, "abduction": 0, "rotation": 0 },
 
+    "clavicle_left": { "flexion": 0, "abduction": 0, "rotation": 0 },
     "shoulder_left": { "flexion": 45, "abduction": 15, "rotation": 0 },
     "elbow_left": { "flexion": 90, "rotation": 0 },
     "wrist_left": { "flexion": 0, "abduction": 0 },
 
+    "clavicle_right": { "flexion": 0, "abduction": 0, "rotation": 0 },
     "shoulder_right": { "flexion": 45, "abduction": 15, "rotation": 0 },
     "elbow_right": { "flexion": 90, "rotation": 0 },
     "wrist_right": { "flexion": 0, "abduction": 0 }

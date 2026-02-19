@@ -2,6 +2,8 @@
   "_comment": "Standing relaxed - all angles zero",
   "character": "james.character.json",
   "joints": {
+    "pelvis": { "flexion": 0, "abduction": 0, "rotation": 0 },
+
     "hip_left": { "flexion": 0, "abduction": 0, "rotation": 0 },
     "knee_left": { "angle": 0 },
     "ankle_left": { "flexion": 0, "abduction": 0, "rotation": 0 },
@@ -17,10 +19,12 @@
     "neck": { "flexion": 0, "abduction": 0, "rotation": 0 },
     "head": { "flexion": 0, "abduction": 0, "rotation": 0 },
 
+    "clavicle_left": { "flexion": 0, "abduction": 0, "rotation": 0 },
     "shoulder_left": { "flexion": 0, "abduction": 0, "rotation": 0 },
     "elbow_left": { "flexion": 0, "rotation": 0 },
     "wrist_left": { "flexion": 0, "abduction": 0 },
 
+    "clavicle_right": { "flexion": 0, "abduction": 0, "rotation": 0 },
     "shoulder_right": { "flexion": 0, "abduction": 0, "rotation": 0 },
     "elbow_right": { "flexion": 0, "rotation": 0 },
     "wrist_right": { "flexion": 0, "abduction": 0 }
