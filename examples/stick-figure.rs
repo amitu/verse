@@ -50,13 +50,22 @@ struct Skeleton {
     bones: HashMap<String, BoneDef>,
 }
 
+#[derive(Debug, Clone, PartialEq)]
+enum BoneSide {
+    Center,
+    Left,
+    Right,
+}
+
 #[derive(Debug, Clone)]
 struct BoneDef {
     default_length: f32,
+    rest_direction: Vec3,
+    offset: Vec3,
+    side: BoneSide,
     joint_type: JointType,
     #[allow(dead_code)]
     constraints: HashMap<String, (f32, f32)>,
-    default_angles: HashMap<String, f32>,
     children: Vec<String>,
 }
 
@@ -124,12 +133,32 @@ fn load_skeleton(path: &str) -> Skeleton {
                 }
             }
 
-            let mut default_angles = HashMap::new();
-            if let Some(defaults) = data["joint"]["default_angles"].as_object() {
-                for (axis, val) in defaults {
-                    default_angles.insert(axis.clone(), val.as_f64().unwrap_or(0.0) as f32);
-                }
-            }
+            let rest_direction = data["rest_direction"]
+                .as_array()
+                .map(|arr| Vec3::new(
+                    arr[0].as_f64().unwrap_or(0.0) as f32,
+                    arr[1].as_f64().unwrap_or(-1.0) as f32,
+                    arr[2].as_f64().unwrap_or(0.0) as f32,
+                ))
+                .unwrap_or(Vec3::NEG_Y);
+
+            let offset = data["offset"]
+                .as_array()
+                .map(|arr| Vec3::new(
+                    arr[0].as_f64().unwrap_or(0.0) as f32,
+                    arr[1].as_f64().unwrap_or(0.0) as f32,
+                    arr[2].as_f64().unwrap_or(0.0) as f32,
+                ))
+                .unwrap_or(Vec3::ZERO);
+
+            // Infer side from bone name
+            let side = if name.contains("left") {
+                BoneSide::Left
+            } else if name.contains("right") {
+                BoneSide::Right
+            } else {
+                BoneSide::Center
+            };
 
             let children: Vec<String> = data["children"]
                 .as_array()
@@ -144,9 +173,11 @@ fn load_skeleton(path: &str) -> Skeleton {
                 name.clone(),
                 BoneDef {
                     default_length: data["default_length"].as_f64().unwrap_or(0.0) as f32,
+                    rest_direction,
+                    offset,
+                    side,
                     joint_type,
                     constraints,
-                    default_angles,
                     children,
                 },
             );
@@ -217,26 +248,42 @@ fn deg_to_rad(deg: f32) -> f32 {
     deg * PI / 180.0
 }
 
-fn angles_to_rotation(joint_type: &JointType, angles: &HashMap<String, f32>, defaults: &HashMap<String, f32>) -> Quat {
+fn angles_to_rotation(joint_type: &JointType, angles: &HashMap<String, f32>, side: &BoneSide) -> Quat {
     let get = |name: &str| -> f32 {
-        *angles.get(name).or_else(|| defaults.get(name)).unwrap_or(&0.0)
+        *angles.get(name).unwrap_or(&0.0)
     };
+
+    // Mirror factor: for right side, negate abduction so positive = outward on both sides
+    let mirror = if *side == BoneSide::Right { -1.0 } else { 1.0 };
 
     match joint_type {
         JointType::Root => Quat::IDENTITY,
         JointType::BallSocket => {
+            // flexion = forward/back (same both sides)
+            // abduction = outward/inward (mirrored for right side)
+            // rotation = twist (same both sides)
             let flexion = get("flexion");
-            let abduction = get("abduction");
+            let abduction = get("abduction") * mirror;
             let rotation = get("rotation");
-            let q_abduction = Quat::from_rotation_z(deg_to_rad(abduction));
-            let q_flexion = Quat::from_rotation_x(deg_to_rad(flexion));
-            let q_rotation = Quat::from_rotation_y(deg_to_rad(rotation));
-            q_abduction * q_flexion * q_rotation
+            Quat::from_euler(EulerRot::ZXY,
+                deg_to_rad(abduction),
+                deg_to_rad(flexion),
+                deg_to_rad(rotation))
         }
         JointType::Hinge => {
             let angle = get("angle");
             Quat::from_rotation_x(deg_to_rad(angle))
         }
+    }
+}
+
+fn rest_direction_to_rotation(rest_dir: Vec3) -> Quat {
+    // Convert rest direction to a rotation
+    // Bones extend along NEG_Y by default in our coordinate system
+    if rest_dir.dot(Vec3::NEG_Y).abs() > 0.999 {
+        if rest_dir.y < 0.0 { Quat::IDENTITY } else { Quat::from_rotation_x(PI) }
+    } else {
+        Quat::from_rotation_arc(Vec3::NEG_Y, rest_dir)
     }
 }
 
@@ -263,7 +310,7 @@ fn compute_bone_visuals(
     pose: &Pose,
     bone_name: &str,
     parent_pos: Vec3,
-    parent_rotation: Quat,
+    parent_pose_accum: Quat,  // Only accumulated POSE rotations, not rest
 ) -> Vec<(String, BoneVisual)> {
     let mut result = Vec::new();
 
@@ -274,27 +321,40 @@ fn compute_bone_visuals(
     let scale = character.bone_scales.get(bone_name).copied().unwrap_or(1.0);
     let length = bone_def.default_length * scale;
 
+    // Rest direction defines the bone's natural orientation (absolute, not inherited)
+    let rest_rotation = rest_direction_to_rotation(bone_def.rest_direction);
+
+    // Pose angles modify from rest position
     let angles = pose.joints.get(bone_name).cloned().unwrap_or_default();
-    let local_rotation = angles_to_rotation(&bone_def.joint_type, &angles, &bone_def.default_angles);
-    let world_rotation = parent_rotation * local_rotation;
+    let pose_rotation = angles_to_rotation(&bone_def.joint_type, &angles, &bone_def.side);
+
+    // World rotation: rest direction + accumulated parent poses + local pose
+    // Key: rest_rotation is NOT inherited from parent, only pose rotations are
+    let world_rotation = rest_rotation * parent_pose_accum * pose_rotation;
+
+    // Apply offset in the rest frame (before pose modifications)
+    let start_pos = parent_pos + rest_rotation * bone_def.offset;
 
     let dir = world_rotation * Vec3::NEG_Y;
-    let end_pos = parent_pos + dir * length;
+    let end_pos = start_pos + dir * length;
 
     if length > 0.0 {
         result.push((
             bone_name.to_string(),
             BoneVisual {
-                start: parent_pos,
+                start: start_pos,
                 end: end_pos,
                 rotation: world_rotation,
             },
         ));
     }
 
+    // For children, accumulate pose rotations (but not rest)
+    let child_pose_accum = parent_pose_accum * pose_rotation;
+
     for child_name in &bone_def.children {
         let child_visuals = compute_bone_visuals(
-            skeleton, character, pose, child_name, end_pos, world_rotation,
+            skeleton, character, pose, child_name, end_pos, child_pose_accum,
         );
         result.extend(child_visuals);
     }
@@ -364,11 +424,13 @@ fn spawn_figure(
         let is_spine = name.contains("spine") || name == "neck";
 
         if is_head {
-            let head_mesh = meshes.add(Sphere::new(length * 0.6));
+            // Cuboid so we can see head rotation (front is longer)
+            let head_mesh = meshes.add(Cuboid::new(10.0, length, 12.0));
+            let head_rotation = visual.rotation * Quat::from_rotation_x(std::f32::consts::FRAC_PI_2);
             commands.spawn((
                 Mesh3d(head_mesh),
                 MeshMaterial3d(head_material.clone()),
-                Transform::from_translation(center),
+                Transform::from_translation(center).with_rotation(head_rotation),
                 FigurePart,
             ));
         } else if is_foot {
