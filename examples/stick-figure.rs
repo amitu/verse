@@ -395,17 +395,69 @@ fn spawn_figure(
         ..default()
     });
 
-    let joint_mesh = meshes.add(Sphere::new(2.5));
+    let joint_mesh = meshes.add(Sphere::new(2.0));
 
     let visuals = compute_bone_visuals(
         skeleton, character, pose, "root", character.hip_position, Quat::IDENTITY,
     );
 
-    // Hip joint
+    // Find key positions for torso
+    let pelvis_pos = character.hip_position;
+    let mut shoulder_pos = pelvis_pos + Vec3::Y * 50.0; // default fallback
+    let mut clavicle_left_start = shoulder_pos;
+    let mut clavicle_right_start = shoulder_pos;
+
+    for (name, visual) in &visuals {
+        if name == "spine2" {
+            shoulder_pos = visual.end;
+        }
+        if name == "clavicle_left" {
+            clavicle_left_start = visual.start;
+        }
+        if name == "clavicle_right" {
+            clavicle_right_start = visual.start;
+        }
+    }
+
+    // Draw torso as a tapered box from hips to shoulders
+    let torso_height = shoulder_pos.y - pelvis_pos.y;
+    let torso_center = (pelvis_pos + shoulder_pos) / 2.0;
+    if torso_height > 1.0 {
+        // Main torso body - wider at shoulders, narrower at hips
+        let torso_mesh = meshes.add(Cuboid::new(28.0, torso_height, 14.0));
+        commands.spawn((
+            Mesh3d(torso_mesh),
+            MeshMaterial3d(torso_material.clone()),
+            Transform::from_translation(torso_center),
+            FigurePart,
+        ));
+    }
+
+    // Shoulder joints
     commands.spawn((
         Mesh3d(joint_mesh.clone()),
         MeshMaterial3d(joint_material.clone()),
-        Transform::from_translation(character.hip_position),
+        Transform::from_translation(clavicle_left_start),
+        FigurePart,
+    ));
+    commands.spawn((
+        Mesh3d(joint_mesh.clone()),
+        MeshMaterial3d(joint_material.clone()),
+        Transform::from_translation(clavicle_right_start),
+        FigurePart,
+    ));
+
+    // Hip joints
+    commands.spawn((
+        Mesh3d(joint_mesh.clone()),
+        MeshMaterial3d(joint_material.clone()),
+        Transform::from_translation(pelvis_pos + Vec3::new(-10.0, 0.0, 0.0)),
+        FigurePart,
+    ));
+    commands.spawn((
+        Mesh3d(joint_mesh.clone()),
+        MeshMaterial3d(joint_material.clone()),
+        Transform::from_translation(pelvis_pos + Vec3::new(10.0, 0.0, 0.0)),
         FigurePart,
     ));
 
@@ -413,19 +465,34 @@ fn spawn_figure(
         let length = visual.start.distance(visual.end);
         if length < 0.1 { continue; }
 
+        // Skip spine bones - torso covers them
+        let is_spine = name == "spine" || name == "spine1" || name == "spine2" || name == "pelvis";
+        if is_spine { continue; }
+
+        // Skip clavicles - they're inside the torso visually
+        let is_clavicle = name.contains("clavicle");
+        if is_clavicle { continue; }
+
         let center = (visual.start + visual.end) / 2.0;
         let dir = (visual.end - visual.start).normalize();
 
         let is_head = name == "head";
-        let is_foot = name.contains("foot");
-        let is_hand = name.contains("hand");
-        let is_leg = name.contains("leg");
-        let is_arm = name.contains("arm") || name.contains("shoulder");
-        let is_spine = name.contains("spine") || name == "neck";
+        let is_neck = name == "neck";
+        let is_hip = name.contains("hip_");
+        let is_knee = name.contains("knee");
+        let is_ankle = name.contains("ankle");
+        let is_ball = name.contains("ball_");
+        let is_toes = name.contains("toes");
+        let is_shoulder = name.contains("shoulder");
+        let is_elbow = name.contains("elbow");
+        let is_wrist = name.contains("wrist");
+        let is_palm = name.contains("palm");
+        let is_fingers = name.contains("fingers");
+        let is_thumb = name.contains("thumb");
 
         if is_head {
-            // Cuboid so we can see head rotation (front is longer)
-            let head_mesh = meshes.add(Cuboid::new(10.0, length, 12.0));
+            // Cuboid so we can see head rotation
+            let head_mesh = meshes.add(Cuboid::new(9.0, length, 10.0));
             let head_rotation = visual.rotation * Quat::from_rotation_x(std::f32::consts::FRAC_PI_2);
             commands.spawn((
                 Mesh3d(head_mesh),
@@ -433,45 +500,77 @@ fn spawn_figure(
                 Transform::from_translation(center).with_rotation(head_rotation),
                 FigurePart,
             ));
-        } else if is_foot {
-            let foot_mesh = meshes.add(Cuboid::new(8.0, 4.0, length));
-            let foot_rotation = visual.rotation * Quat::from_rotation_x(std::f32::consts::FRAC_PI_2);
+        } else if is_toes {
+            // Small cylinders for toes
+            let mesh = meshes.add(Cylinder::new(1.5, length));
             commands.spawn((
-                Mesh3d(foot_mesh),
+                Mesh3d(mesh),
                 MeshMaterial3d(extremity_material.clone()),
-                Transform::from_translation(center).with_rotation(foot_rotation),
+                Transform::from_translation(center).with_rotation(rotation_from_direction(dir)),
                 FigurePart,
             ));
-        } else if is_hand {
-            let hand_mesh = meshes.add(Cuboid::new(6.0, 3.0, length));
-            let hand_rotation = visual.rotation * Quat::from_rotation_x(std::f32::consts::FRAC_PI_2);
+        } else if is_ball {
+            // Ball of foot
+            let mesh = meshes.add(Cuboid::new(8.0, 3.0, length));
+            let rot = visual.rotation * Quat::from_rotation_x(std::f32::consts::FRAC_PI_2);
             commands.spawn((
-                Mesh3d(hand_mesh),
+                Mesh3d(mesh),
                 MeshMaterial3d(extremity_material.clone()),
-                Transform::from_translation(center).with_rotation(hand_rotation),
+                Transform::from_translation(center).with_rotation(rot),
+                FigurePart,
+            ));
+        } else if is_fingers {
+            let mesh = meshes.add(Cylinder::new(1.0, length));
+            commands.spawn((
+                Mesh3d(mesh),
+                MeshMaterial3d(extremity_material.clone()),
+                Transform::from_translation(center).with_rotation(rotation_from_direction(dir)),
+                FigurePart,
+            ));
+        } else if is_thumb {
+            let mesh = meshes.add(Cylinder::new(1.0, length));
+            commands.spawn((
+                Mesh3d(mesh),
+                MeshMaterial3d(extremity_material.clone()),
+                Transform::from_translation(center).with_rotation(rotation_from_direction(dir)),
+                FigurePart,
+            ));
+        } else if is_palm || is_wrist {
+            let mesh = meshes.add(Cuboid::new(5.0, length, 3.0));
+            let rot = visual.rotation * Quat::from_rotation_x(std::f32::consts::FRAC_PI_2);
+            commands.spawn((
+                Mesh3d(mesh),
+                MeshMaterial3d(extremity_material.clone()),
+                Transform::from_translation(center).with_rotation(rot),
+                FigurePart,
+            ));
+        } else if is_neck {
+            let mesh = meshes.add(Cylinder::new(3.0, length));
+            commands.spawn((
+                Mesh3d(mesh),
+                MeshMaterial3d(head_material.clone()),
+                Transform::from_translation(center).with_rotation(rotation_from_direction(dir)),
                 FigurePart,
             ));
         } else {
-            let radius = if is_spine { 4.0 } else if is_leg { 3.0 } else { 2.5 };
-            let bone_mesh = meshes.add(Cylinder::new(radius, length));
-            let material = if is_spine {
-                torso_material.clone()
-            } else if is_leg {
+            // Limbs: legs and arms
+            let radius = if is_hip || is_knee { 3.0 } else if is_shoulder || is_elbow { 2.5 } else { 2.0 };
+            let material = if is_hip || is_knee || is_ankle {
                 leg_material.clone()
-            } else if is_arm {
-                arm_material.clone()
             } else {
-                leg_material.clone()
+                arm_material.clone()
             };
+            let mesh = meshes.add(Cylinder::new(radius, length));
             commands.spawn((
-                Mesh3d(bone_mesh),
+                Mesh3d(mesh),
                 MeshMaterial3d(material),
                 Transform::from_translation(center).with_rotation(rotation_from_direction(dir)),
                 FigurePart,
             ));
         }
 
-        if !is_head {
+        // Joint spheres at bone ends (skip for head and small parts)
+        if !is_head && !is_fingers && !is_thumb && !is_toes {
             commands.spawn((
                 Mesh3d(joint_mesh.clone()),
                 MeshMaterial3d(joint_material.clone()),

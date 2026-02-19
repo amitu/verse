@@ -295,7 +295,7 @@
         "constraints": {
           "flexion": [-20, 60],
           "abduction": [-30, 30],
-          "rotation": [-30, 30]
+          "rotation": [0, 0]
         }
       },
       "children": []
@@ -387,7 +387,7 @@
         "constraints": {
           "flexion": [-20, 60],
           "abduction": [-30, 30],
-          "rotation": [-30, 30]
+          "rotation": [0, 0]
         }
       },
       "children": []

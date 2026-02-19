@@ -1,5 +1,5 @@
 {
-  "_comment": "Sitting pose",
+  "_comment": "Sitting pose with hands relaxed",
   "character": "james.character.json",
   "joints": {
     "pelvis": { "flexion": 0, "abduction": 0, "rotation": 0 },
@@ -7,10 +7,14 @@
     "hip_left": { "flexion": 90, "abduction": 5, "rotation": 0 },
     "knee_left": { "angle": 90 },
     "ankle_left": { "flexion": 0, "abduction": 0, "rotation": 0 },
+    "ball_left": { "angle": 0 },
+    "toes_left": { "angle": 0 },
 
     "hip_right": { "flexion": 90, "abduction": 5, "rotation": 0 },
     "knee_right": { "angle": 90 },
     "ankle_right": { "flexion": 0, "abduction": 0, "rotation": 0 },
+    "ball_right": { "angle": 0 },
+    "toes_right": { "angle": 0 },
 
     "spine": { "flexion": 0, "abduction": 0, "rotation": 0 },
     "spine1": { "flexion": 0, "abduction": 0, "rotation": 0 },
@@ -20,13 +24,17 @@
     "head": { "flexion": 0, "abduction": 0, "rotation": 0 },
 
     "clavicle_left": { "flexion": 0, "abduction": 0, "rotation": 0 },
-    "shoulder_left": { "flexion": 45, "abduction": 15, "rotation": 0 },
+    "shoulder_left": { "flexion": 45, "abduction": 10, "rotation": 0 },
     "elbow_left": { "flexion": 90, "rotation": 0 },
     "wrist_left": { "flexion": 0, "abduction": 0 },
+    "fingers_left": { "angle": 30 },
+    "thumb_left": { "flexion": 20, "abduction": 0 },
 
     "clavicle_right": { "flexion": 0, "abduction": 0, "rotation": 0 },
-    "shoulder_right": { "flexion": 45, "abduction": 15, "rotation": 0 },
+    "shoulder_right": { "flexion": 45, "abduction": 10, "rotation": 0 },
     "elbow_right": { "flexion": 90, "rotation": 0 },
-    "wrist_right": { "flexion": 0, "abduction": 0 }
+    "wrist_right": { "flexion": 0, "abduction": 0 },
+    "fingers_right": { "angle": 30 },
+    "thumb_right": { "flexion": 20, "abduction": 0 }
   }
 }
