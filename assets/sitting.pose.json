@@ -1,14 +1,14 @@
 {
-  "_comment": "Sitting pose - same angles = same motion on both sides",
+  "_comment": "Sitting pose - bend at hip 90, bend at knee 90",
   "character": "james.character.json",
   "joints": {
-    "upper_leg_left": { "flexion": 90, "abduction": 5, "rotation": 0 },
-    "lower_leg_left": { "angle": 90 },
-    "foot_left": { "flexion": 0, "abduction": 0, "rotation": 0 },
+    "hip_left": { "flexion": 90, "abduction": 5, "rotation": 0 },
+    "knee_left": { "angle": 90 },
+    "ankle_left": { "flexion": 0, "abduction": 0, "rotation": 0 },
 
-    "upper_leg_right": { "flexion": 90, "abduction": 5, "rotation": 0 },
-    "lower_leg_right": { "angle": 90 },
-    "foot_right": { "flexion": 0, "abduction": 0, "rotation": 0 },
+    "hip_right": { "flexion": 90, "abduction": 5, "rotation": 0 },
+    "knee_right": { "angle": 90 },
+    "ankle_right": { "flexion": 0, "abduction": 0, "rotation": 0 },
 
     "spine": { "flexion": 0, "abduction": 0, "rotation": 0 },
     "spine1": { "flexion": 0, "abduction": 0, "rotation": 0 },
@@ -17,12 +17,12 @@
     "neck": { "flexion": 0, "abduction": 0, "rotation": 0 },
     "head": { "flexion": 0, "abduction": 0, "rotation": 0 },
 
-    "upper_arm_left": { "flexion": 45, "abduction": 15, "rotation": 0 },
-    "lower_arm_left": { "angle": 90 },
-    "hand_left": { "flexion": 0, "abduction": 0, "rotation": 0 },
+    "shoulder_left": { "flexion": 45, "abduction": 15, "rotation": 0 },
+    "elbow_left": { "angle": 90 },
+    "wrist_left": { "flexion": 0, "abduction": 0, "rotation": 0 },
 
-    "upper_arm_right": { "flexion": 45, "abduction": 15, "rotation": 0 },
-    "lower_arm_right": { "angle": 90 },
-    "hand_right": { "flexion": 0, "abduction": 0, "rotation": 0 }
+    "shoulder_right": { "flexion": 45, "abduction": 15, "rotation": 0 },
+    "elbow_right": { "angle": 90 },
+    "wrist_right": { "flexion": 0, "abduction": 0, "rotation": 0 }
   }
 }

@@ -398,7 +398,7 @@ fn spawn_figure(
     let joint_mesh = meshes.add(Sphere::new(2.5));
 
     let visuals = compute_bone_visuals(
-        skeleton, character, pose, "hip", character.hip_position, Quat::IDENTITY,
+        skeleton, character, pose, "pelvis", character.hip_position, Quat::IDENTITY,
     );
 
     // Hip joint

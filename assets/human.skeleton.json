@@ -1,12 +1,12 @@
 {
-  "_comment": "Humanoid skeleton - rest_direction defines natural bone orientation, angles=0 is relaxed standing",
+  "_comment": "Humanoid skeleton - named by joints, angles=0 is relaxed standing",
   "bones": {
-    "hip": {
+    "pelvis": {
       "type": "root",
       "default_length": 0,
-      "children": ["spine", "upper_leg_left", "upper_leg_right"]
+      "children": ["spine", "hip_left", "hip_right"]
     },
-    "upper_leg_left": {
+    "hip_left": {
       "type": "bone",
       "default_length": 45,
       "rest_direction": [0, -1, 0],
@@ -19,9 +19,9 @@
           "rotation": [-45, 45]
         }
       },
-      "children": ["lower_leg_left"]
+      "children": ["knee_left"]
     },
-    "lower_leg_left": {
+    "knee_left": {
       "type": "bone",
       "default_length": 45,
       "rest_direction": [0, -1, 0],
@@ -29,9 +29,9 @@
         "type": "hinge",
         "constraints": { "angle": [0, 140] }
       },
-      "children": ["foot_left"]
+      "children": ["ankle_left"]
     },
-    "foot_left": {
+    "ankle_left": {
       "type": "bone",
       "default_length": 20,
       "rest_direction": [0, 0, 1],
@@ -45,7 +45,7 @@
       },
       "children": []
     },
-    "upper_leg_right": {
+    "hip_right": {
       "type": "bone",
       "default_length": 45,
       "rest_direction": [0, -1, 0],
@@ -58,9 +58,9 @@
           "rotation": [-45, 45]
         }
       },
-      "children": ["lower_leg_right"]
+      "children": ["knee_right"]
     },
-    "lower_leg_right": {
+    "knee_right": {
       "type": "bone",
       "default_length": 45,
       "rest_direction": [0, -1, 0],
@@ -68,9 +68,9 @@
         "type": "hinge",
         "constraints": { "angle": [0, 140] }
       },
-      "children": ["foot_right"]
+      "children": ["ankle_right"]
     },
-    "foot_right": {
+    "ankle_right": {
       "type": "bone",
       "default_length": 20,
       "rest_direction": [0, 0, 1],
@@ -124,7 +124,7 @@
           "rotation": [-15, 15]
         }
       },
-      "children": ["neck", "upper_arm_left", "upper_arm_right"]
+      "children": ["neck", "shoulder_left", "shoulder_right"]
     },
     "neck": {
       "type": "bone",
@@ -154,7 +154,7 @@
       },
       "children": []
     },
-    "upper_arm_left": {
+    "shoulder_left": {
       "type": "bone",
       "default_length": 30,
       "rest_direction": [0, -1, 0],
@@ -167,9 +167,9 @@
           "rotation": [-90, 90]
         }
       },
-      "children": ["lower_arm_left"]
+      "children": ["elbow_left"]
     },
-    "lower_arm_left": {
+    "elbow_left": {
       "type": "bone",
       "default_length": 28,
       "rest_direction": [0, -1, 0],
@@ -177,9 +177,9 @@
         "type": "hinge",
         "constraints": { "angle": [0, 145] }
       },
-      "children": ["hand_left"]
+      "children": ["wrist_left"]
     },
-    "hand_left": {
+    "wrist_left": {
       "type": "bone",
       "default_length": 18,
       "rest_direction": [0, -1, 0],
@@ -193,7 +193,7 @@
       },
       "children": []
     },
-    "upper_arm_right": {
+    "shoulder_right": {
       "type": "bone",
       "default_length": 30,
       "rest_direction": [0, -1, 0],
@@ -206,9 +206,9 @@
           "rotation": [-90, 90]
         }
       },
-      "children": ["lower_arm_right"]
+      "children": ["elbow_right"]
     },
-    "lower_arm_right": {
+    "elbow_right": {
       "type": "bone",
       "default_length": 28,
       "rest_direction": [0, -1, 0],
@@ -216,9 +216,9 @@
         "type": "hinge",
         "constraints": { "angle": [0, 145] }
       },
-      "children": ["hand_right"]
+      "children": ["wrist_right"]
     },
-    "hand_right": {
+    "wrist_right": {
       "type": "bone",
       "default_length": 18,
       "rest_direction": [0, -1, 0],
