@@ -22,12 +22,12 @@
     "neck": 1.0,
     "head": 1.0,
 
-    "shoulder_left": 1.0,
+    "shoulder_left": 3.0,
     "upper_arm_left": 1.0,
     "lower_arm_left": 1.0,
     "hand_left": 1.0,
 
-    "shoulder_right": 1.0,
+    "shoulder_right": 3.0,
     "upper_arm_right": 1.0,
     "lower_arm_right": 1.0,
     "hand_right": 1.0

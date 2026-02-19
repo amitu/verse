@@ -158,7 +158,7 @@
       "type": "bone",
       "default_length": 30,
       "rest_direction": [0, -1, 0],
-      "offset": [-8, -5, 0],
+      "offset": [-20, -5, 0],
       "joint": {
         "type": "ball_socket",
         "constraints": {
@@ -174,8 +174,12 @@
       "default_length": 28,
       "rest_direction": [0, -1, 0],
       "joint": {
-        "type": "hinge",
-        "constraints": { "angle": [0, 145] }
+        "type": "ball_socket",
+        "constraints": {
+          "flexion": [0, 145],
+          "abduction": [0, 0],
+          "rotation": [-90, 90]
+        }
       },
       "children": ["wrist_left"]
     },
@@ -188,7 +192,7 @@
         "constraints": {
           "flexion": [-80, 80],
           "abduction": [-40, 40],
-          "rotation": [-30, 30]
+          "rotation": [0, 0]
         }
       },
       "children": []
@@ -213,8 +217,12 @@
       "default_length": 28,
       "rest_direction": [0, -1, 0],
       "joint": {
-        "type": "hinge",
-        "constraints": { "angle": [0, 145] }
+        "type": "ball_socket",
+        "constraints": {
+          "flexion": [0, 145],
+          "abduction": [0, 0],
+          "rotation": [-90, 90]
+        }
       },
       "children": ["wrist_right"]
     },
@@ -227,7 +235,7 @@
         "constraints": {
           "flexion": [-80, 80],
           "abduction": [-40, 40],
-          "rotation": [-30, 30]
+          "rotation": [0, 0]
         }
       },
       "children": []

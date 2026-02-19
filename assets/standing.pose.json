@@ -18,11 +18,11 @@
     "head": { "flexion": 0, "abduction": 0, "rotation": 0 },
 
     "shoulder_left": { "flexion": 0, "abduction": 0, "rotation": 0 },
-    "elbow_left": { "angle": 0 },
-    "wrist_left": { "flexion": 0, "abduction": 0, "rotation": 0 },
+    "elbow_left": { "flexion": 0, "rotation": 0 },
+    "wrist_left": { "flexion": 0, "abduction": 0 },
 
     "shoulder_right": { "flexion": 0, "abduction": 0, "rotation": 0 },
-    "elbow_right": { "angle": 0 },
-    "wrist_right": { "flexion": 0, "abduction": 0, "rotation": 0 }
+    "elbow_right": { "flexion": 0, "rotation": 0 },
+    "wrist_right": { "flexion": 0, "abduction": 0 }
   }
 }
